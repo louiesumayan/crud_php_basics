@@ -1,6 +1,11 @@
 <?php
 session_start();
 
+if (!isset($_SESSION['csrf_token'])) {
+      $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+
+
 require_once 'config.php';
 ?>
 <!doctype html>
@@ -26,8 +31,8 @@ require_once 'config.php';
                   Add User
             </button>
             <p class="text-center bg-warning fs-4 text-danger">
-                  <?= isset($_SESSION['error_msg']) ? $_SESSION['error_msg'] : '' ?>
-                  <?php unset($_SESSION['error_msg']); ?>
+                  <?= isset($_SESSION['message']) ? $_SESSION['message'] : '' ?>
+                  <?php unset($_SESSION['message']); ?>
             </p>
             <?php
             // prepare and execute
@@ -73,11 +78,19 @@ require_once 'config.php';
                                                       class="editUserBTN btn btn-info">
                                                       EDIT
                                                 </button>
-                                                <button type="button"
-                                                      value="<?= htmlspecialchars($data_result['id'], ENT_QUOTES, 'UTF-8'); ?>"
-                                                      class="deleteUserBTN btn btn-warning">
-                                                      DELETE
-                                                </button>
+                                                <form method="POST" action="code.php" style="display:inline;">
+                                                      <!-- CSRF Token (Generated in PHP) -->
+                                                      <input type="hidden" name="csrf_token"
+                                                            value="<?= $_SESSION['csrf_token']; ?>">
+
+                                                      <input type="hidden" name="delete"
+                                                            value="<?= htmlspecialchars($data_result['id'], ENT_QUOTES, 'UTF-8'); ?>" />
+
+                                                      <button type="submit" name="submit_delete" class="btn btn-warning"
+                                                            onClick="return confirm('Are you sure you want to delete this post?');">
+                                                            DELETE
+                                                      </button>
+                                                </form>
                                           </td>
                                     </tr>
                               <?php endforeach; ?>
@@ -114,7 +127,7 @@ require_once 'config.php';
       </div>
 
       <!-- Edit User Modal -->
-      <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+      <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel">
             <div class="modal-dialog">
                   <div class="modal-content">
                         <div class="modal-header">
@@ -123,7 +136,7 @@ require_once 'config.php';
                                     aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                              <form id="editUserForm" method="POST">
+                              <form action="code.php" id="editUserForm" method="POST">
                                     <input type="hidden" id="editUserId" name="id" />
                                     <div class="mb-3">
                                           <label for="editUserName" class="form-label">Name</label>
@@ -135,7 +148,8 @@ require_once 'config.php';
                                           <input name="email" type="email" class="form-control" id="editUserEmail"
                                                 required />
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Update User</button>
+                                    <button name="update_user" type="submit" class="btn btn-primary">Update
+                                          User</button>
                               </form>
                         </div>
                   </div>
@@ -178,7 +192,6 @@ require_once 'config.php';
                   document
                         .getElementById("editUserForm")
                         .addEventListener("submit", function (e) {
-                              e.preventDefault();
                               bsEditModal.hide();
                         });
             });
