@@ -47,11 +47,13 @@
                   </thead>
                   <tbody id="userTableBody">
                         <!-- Example static row; you will probably generate these dynamically -->
+                        <!-- check if the $result is empty -->
                         <?php if ($result->num_rows === 0): ?>
                               <tr>
                                     <td colspan="4" class="text-center">No users found.</td>
                               </tr>
                         <?php else: ?>
+                              <!-- if not proceed in looping -->
                               <?php foreach ($result as $data_result): ?>
                                     <tr>
                                           <td><?= htmlspecialchars($data_result['id'], ENT_QUOTES, 'UTF-8'); ?></td>
