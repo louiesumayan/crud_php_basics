@@ -1,4 +1,8 @@
-<?php require_once 'config.php'; ?>
+<?php
+session_start();
+
+require_once 'config.php';
+?>
 <!doctype html>
 <html lang="en">
 
@@ -21,6 +25,10 @@
             <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addUserModal">
                   Add User
             </button>
+            <p class="text-center bg-warning fs-4 text-danger">
+                  <?= isset($_SESSION['error_msg']) ? $_SESSION['error_msg'] : '' ?>
+                  <?php unset($_SESSION['error_msg']); ?>
+            </p>
             <?php
             // prepare and execute
             $stmt = $conn->prepare("SELECT * FROM users_table");
@@ -74,7 +82,6 @@
                                     </tr>
                               <?php endforeach; ?>
                         <?php endif; ?>
-                        <!-- More rows… -->
                   </tbody>
             </table>
       </div>
@@ -90,7 +97,7 @@
                         </div>
                         <div class="modal-body">
                               <div id="errorMessage" class="alert alert-warning d-none"></div>
-                              <form id="userFormData" method="POST">
+                              <form action="code.php" id="userFormData" method="POST">
                                     <div class="mb-3">
                                           <label for="userName" class="form-label">Name</label>
                                           <input type="text" class="form-control" id="userName" name="name" />
@@ -99,7 +106,7 @@
                                           <label for="userEmail" class="form-label">Email</label>
                                           <input type="email" class="form-control" id="userEmail" name="email" />
                                     </div>
-                                    <button type="submit" class="btn btn-primary">Add User</button>
+                                    <button name="submit" type="submit" class="btn btn-primary">Add User</button>
                               </form>
                         </div>
                   </div>
